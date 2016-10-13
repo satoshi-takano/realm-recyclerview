@@ -164,12 +164,12 @@ public abstract class RealmBasedRecyclerViewAdapter
         // If automatic updates aren't enabled, then animateResults should be false as well.
         this.animateResults = (automaticUpdate && animateResults);
         if (animateResults) {
-            animatePrimaryColumnIndex = realmResults.getTable().getTable().getPrimaryKey();
+            animatePrimaryColumnIndex = realmResults.getTableOrView().getTable().getPrimaryKey();
             if (animatePrimaryColumnIndex == TableOrView.NO_MATCH) {
                 throw new IllegalStateException(
                         "Animating the results requires a primaryKey.");
             }
-            animatePrimaryIdType = realmResults.getTable().getColumnType(animatePrimaryColumnIndex);
+            animatePrimaryIdType = realmResults.getTableOrView().getColumnType(animatePrimaryColumnIndex);
             if (animatePrimaryIdType != RealmFieldType.INTEGER &&
                     animatePrimaryIdType != RealmFieldType.STRING) {
                 throw new IllegalStateException(
@@ -177,13 +177,13 @@ public abstract class RealmBasedRecyclerViewAdapter
             }
 
             if (animateExtraColumnName != null) {
-                animateExtraColumnIndex = realmResults.getTable().getTable()
+                animateExtraColumnIndex = realmResults.getTableOrView().getTable()
                         .getColumnIndex(animateExtraColumnName);
                 if (animateExtraColumnIndex == TableOrView.NO_MATCH) {
                     throw new IllegalStateException(
                             "Animating the results requires a valid animateColumnName.");
                 }
-                animateExtraIdType = realmResults.getTable().getColumnType(animateExtraColumnIndex);
+                animateExtraIdType = realmResults.getTableOrView().getColumnType(animateExtraColumnIndex);
                 if (animateExtraIdType != RealmFieldType.INTEGER &&
                         animateExtraIdType != RealmFieldType.STRING &&
                         animateExtraIdType != RealmFieldType.DATE) {
@@ -223,7 +223,7 @@ public abstract class RealmBasedRecyclerViewAdapter
     public void onBindHeaderViewHolder(RealmViewHolder holder, int position) {
         String header = rowWrappers.get(position).header;
         final GridSLM.LayoutParams layoutParams =
-            GridSLM.LayoutParams.from(holder.itemView.getLayoutParams());
+                GridSLM.LayoutParams.from(holder.itemView.getLayoutParams());
 
         holder.headerTextView.setText(header);
         if (layoutParams.isHeaderInline()) {
@@ -270,7 +270,7 @@ public abstract class RealmBasedRecyclerViewAdapter
                 // Setup the header
                 if (header != null) {
                     layoutParams.isHeader = true;
-                    onBindHeaderViewHolder(holder,position);
+                    onBindHeaderViewHolder(holder, position);
                 } else {
                     onBindRealmViewHolder((VH) holder, rowWrappers.get(position).realmIndex);
                 }
@@ -441,7 +441,7 @@ public abstract class RealmBasedRecyclerViewAdapter
             int sectionFirstPosition = 0;
             rowWrappers.clear();
 
-            final long headerIndex = realmResults.getTable().getColumnIndex(headerColumnName);
+            final long headerIndex = realmResults.getTableOrView().getTable().getColumnIndex(headerColumnName);
             int i = 0;
             for (RealmModel result : realmResults) {
                 Object rawHeader;
@@ -490,7 +490,7 @@ public abstract class RealmBasedRecyclerViewAdapter
                         return;
                     }
                     Patch patch = DiffUtils.diff(ids, newIds);
-                    List    <Delta> deltas = patch.getDeltas();
+                    List<Delta> deltas = patch.getDeltas();
                     ids = newIds;
                     if (deltas.isEmpty()) {
                         // Nothing has changed - most likely because the notification was for
@@ -606,7 +606,7 @@ public abstract class RealmBasedRecyclerViewAdapter
 
     /**
      * Called when an item has been dismissed by a swipe.
-     *
+     * <p>
      * Only supported with type linearLayout and thus the realmResults can be accessed directly.
      * If it is extended to LinearLayoutWithHeaders, rowWrappers will have to be used.
      */
